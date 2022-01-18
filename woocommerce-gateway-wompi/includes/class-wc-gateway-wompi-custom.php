@@ -39,25 +39,65 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
      */
     public function generate_wompi_widget( $order_id ) {
         $order = new WC_Order( $order_id );
-
+        $tax = $order->total_tax * 100;
+        $phone = $order->get_billing_phone();
+        //borrar
+        $order_id2 = $order_id + 12464333;
         $out = '';
         $out .= '<div class="wompi-button-holder">';
-        $out .= '
+
+        if($order->get_shipping_address_1() !== '')
+        {
+            $out .= '
             <script
                 src="https://checkout.wompi.co/widget.js"
                 data-render="button"
                 data-public-key="'.( WC_Wompi::$settings['testmode'] === 'yes' ? WC_Wompi::$settings['test_public_key'] : WC_Wompi::$settings['public_key'] ).'"
                 data-currency="'.get_woocommerce_currency().'"
                 data-amount-in-cents="'.WC_Wompi_Helper::get_amount_in_cents( $order->get_total() ).'"
-                data-reference="'.$order_id.'"
+                data-reference="'.$order_id2.'"
+                data-tax-in-cents:vat="'.WC_Wompi_Helper::get_amount_in_cents($order->total_tax).'"
+                data-customer-data:email="'.$order->get_billing_email().'"
+                data-customer-data:full-name="'.$order->get_billing_first_name() . " " . $order->get_billing_last_name().'"
+                data-customer-data:phone-number="'.$phone.'"
+                data-customer-data:phone-number-prefix="+57"
+                data-shipping-address:address-line-1="'.$order->get_shipping_address_1().'"
+                data-shipping-address:country="'.$order->get_shipping_country().'"
+                data-shipping-address:city="'.$order->get_shipping_city().'"
+                data-shipping-address:phone-number="'.$phone.'"
+                data-shipping-address:region="'.$order->get_shipping_state().'"
+                data-shipping-address:name="'.$order->get_shipping_first_name() . " " . $order->get_shipping_last_name().'"
                 data-redirect-url="'.$order->get_checkout_order_received_url().'"
                 >
             </script>
         ';
+        } else 
+        {
+            $out .= '
+            <script
+                src="https://checkout.wompi.co/widget.js"
+                data-render="button"
+                data-public-key="'.( WC_Wompi::$settings['testmode'] === 'yes' ? WC_Wompi::$settings['test_public_key'] : WC_Wompi::$settings['public_key'] ).'"
+                data-currency="'.get_woocommerce_currency().'"
+                data-amount-in-cents="'.WC_Wompi_Helper::get_amount_in_cents( $order->get_total()).'"
+                data-reference="'.$order_id2.'"
+                data-tax-in-cents:vat="'.WC_Wompi_Helper::get_amount_in_cents($order->total_tax).'"
+                data-customer-data:email="'.$order->get_billing_email().'"
+                data-customer-data:full-name="'.$order->get_billing_first_name() . " " . $order->get_billing_last_name().'"
+                data-customer-data:phone-number="'.$phone.'"
+                data-customer-data:phone-number-prefix="+57"
+                data-redirect-url="'.$order->get_checkout_order_received_url().'"
+                >
+            </script>
+        ';
+        }
+
+       
         $out .= '</div>';
 
         echo $out;
     }
+    
 
     /**
      * Billing details fields on the checkout page

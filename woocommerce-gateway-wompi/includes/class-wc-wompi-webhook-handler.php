@@ -109,7 +109,7 @@ class WC_Wompi_Webhook_Handler
     }
 
     /**
-     * Apply transaction status
+     * Apply transaction status 
      */
     public function apply_status($order, $transaction)
     {
