@@ -41,8 +41,7 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
         $order = new WC_Order( $order_id );
         $tax = $order->total_tax * 100;
         $phone = $order->get_billing_phone();
-        //borrar
-        $order_id2 = $order_id + 12464333;
+        $order_id2 = $order_id;
         $out = '';
         $out .= '<div class="wompi-button-holder">';
 
@@ -90,11 +89,8 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
                 >
             </script>
         ';
-        }
-
-       
+        }       
         $out .= '</div>';
-
         echo $out;
     }
     

@@ -107,7 +107,6 @@ class WC_Wompi_Webhook_Handler
 
         return true;
     }
-
     /**
      * Apply transaction status 
      */
