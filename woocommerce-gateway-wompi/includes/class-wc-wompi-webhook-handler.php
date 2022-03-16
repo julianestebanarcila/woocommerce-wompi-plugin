@@ -1,12 +1,10 @@
 <?php
 defined('ABSPATH') || exit;
-
 /**
  * Webhook Handler Class
  */
 class WC_Wompi_Webhook_Handler
 {
-
     /**
      * Constructor
      */
@@ -14,17 +12,14 @@ class WC_Wompi_Webhook_Handler
     {
         add_action('woocommerce_api_wc_wompi', array($this, 'check_for_webhook'));
     }
-
     /**
      * Check incoming requests for Wompi Webhook data and process them
      */
     public function check_for_webhook()
     {
-
         if (!WC_Wompi_Helper::is_webhook(true)) {
             return false;
         }
-
         $response = json_decode(file_get_contents('php://input'));
         if (is_object($response)) {
             WC_Wompi_Logger::log('Webhook response: ' . print_r($response, true));
@@ -34,7 +29,6 @@ class WC_Wompi_Webhook_Handler
             status_header(400);
         }
     }
-
     /**
      * Processes the incoming webhook
      */
@@ -50,7 +44,6 @@ class WC_Wompi_Webhook_Handler
                 status_header(400);
         }
     }
-
     /**
      * Process the payment
      */
@@ -81,7 +74,6 @@ class WC_Wompi_Webhook_Handler
             status_header(500);
         }
     }
-
     /**
      * Validate transaction response
      */
@@ -91,20 +83,17 @@ class WC_Wompi_Webhook_Handler
             WC_Wompi_Logger::log('Order Not Found' . ' TRANSACTION ID: ' . $transaction->id);
             return false;
         }
-
         $order_id = method_exists($order, 'get_id') ? $order->get_id() : $order->id;
 
         if ($order->get_payment_method() != 'wompi') {
             WC_Wompi_Logger::log('Payment method incorrect' . ' TRANSACTION ID: ' . $transaction->id . ' ORDER ID: ' . $order_id . ' PAYMENT METHOD: ' . $order->get_payment_method());
             return false;
         }
-
         $amount = WC_Wompi_Helper::get_amount_in_cents($order->get_total());
         if ($transaction->amount_in_cents != $amount) {
             WC_Wompi_Logger::log('Amount incorrect' . ' TRANSACTION ID: ' . $transaction->id . ' ORDER ID: ' . $order_id . ' AMOUNT: ' . $amount);
             return false;
         }
-
         return true;
     }
     /**
@@ -128,15 +117,12 @@ class WC_Wompi_Webhook_Handler
                 $this->update_transaction_status($order, __('Wompi payment ERROR. TRANSACTION ID: ', 'woocommerce-gateway-wompi') . ' (' . $transaction->id . ')', 'failed');
         }
     }
-
     /**
      * Update order data
      */
     public function update_order_data($order, $transaction)
     {
-
         $order_id = method_exists($order, 'get_id') ? $order->get_id() : $order->id;
-
         // Check if order data was set
         if (!$order->get_transaction_id()) {
             // Set transaction id
@@ -162,7 +148,6 @@ class WC_Wompi_Webhook_Handler
             }
         }
     }
-
     /**
      * Update transaction status
      */
@@ -174,7 +159,6 @@ class WC_Wompi_Webhook_Handler
             $order->update_status($status);
         }
     }
-
     /**
      * Validate response checksum according with https://docs.wompi.co/docs/en/eventos#seguridad
      * @param $response
@@ -199,7 +183,6 @@ class WC_Wompi_Webhook_Handler
             }
             //concatenate timestamp
             $toHash .= $response->timestamp;
-
             //concatenate event private key
             $options = WC_Wompi::$settings;
             if ('yes' === $options['testmode']) {
@@ -207,7 +190,6 @@ class WC_Wompi_Webhook_Handler
             } else {
                 $toHash .= $options['event_secret_key'];
             }
-
             //hash and compare
             return $response->signature->checksum === hash('sha256', $toHash);
         } catch (\Exception $e) {
@@ -216,5 +198,4 @@ class WC_Wompi_Webhook_Handler
         }
     }
 }
-
 new WC_Wompi_Webhook_Handler();

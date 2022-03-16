@@ -1,11 +1,9 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
 /**
  * Extend Payment Gateway class
  */
 class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
-
     /**
      * Vars
      */
@@ -15,14 +13,12 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
     public $private_key;
     public $event_secret_key;
     public static $supported_currency = false;
-
     /**
      * Init hooks
      */
     public function init_hooks() {
         add_action( 'woocommerce_receipt_wompi', array( $this, 'generate_wompi_widget' ) );
     }
-
     /**
      * Returns all supported currencies for this payment method
      */
@@ -30,10 +26,8 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
         if ( self::$supported_currency === false ) {
             self::$supported_currency = apply_filters( 'wc_wompi_supported_currencies', WC_Wompi_API::instance()->get_merchant_data('accepted_currencies') );
         }
-
         return self::$supported_currency;
     }
-
     /**
      * Generate Wompi widget on "Pay for order" page
      */
@@ -41,10 +35,8 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
         $order = new WC_Order( $order_id );
         $tax = $order->total_tax * 100;
         $phone = $order->get_billing_phone();
-        $order_id2 = $order_id;
         $out = '';
         $out .= '<div class="wompi-button-holder">';
-
         if($order->get_shipping_address_1() !== '')
         {
             $out .= '
@@ -54,7 +46,7 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
                 data-public-key="'.( WC_Wompi::$settings['testmode'] === 'yes' ? WC_Wompi::$settings['test_public_key'] : WC_Wompi::$settings['public_key'] ).'"
                 data-currency="'.get_woocommerce_currency().'"
                 data-amount-in-cents="'.WC_Wompi_Helper::get_amount_in_cents( $order->get_total() ).'"
-                data-reference="'.$order_id2.'"
+                data-reference="'.$order_id.'"
                 data-tax-in-cents:vat="'.WC_Wompi_Helper::get_amount_in_cents($order->total_tax).'"
                 data-customer-data:email="'.$order->get_billing_email().'"
                 data-customer-data:full-name="'.$order->get_billing_first_name() . " " . $order->get_billing_last_name().'"
@@ -79,7 +71,7 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
                 data-public-key="'.( WC_Wompi::$settings['testmode'] === 'yes' ? WC_Wompi::$settings['test_public_key'] : WC_Wompi::$settings['public_key'] ).'"
                 data-currency="'.get_woocommerce_currency().'"
                 data-amount-in-cents="'.WC_Wompi_Helper::get_amount_in_cents( $order->get_total()).'"
-                data-reference="'.$order_id2.'"
+                data-reference="'.$order_id.'"
                 data-tax-in-cents:vat="'.WC_Wompi_Helper::get_amount_in_cents($order->total_tax).'"
                 data-customer-data:email="'.$order->get_billing_email().'"
                 data-customer-data:full-name="'.$order->get_billing_first_name() . " " . $order->get_billing_last_name().'"
@@ -93,22 +85,18 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
         $out .= '</div>';
         echo $out;
     }
-    
-
     /**
      * Billing details fields on the checkout page
      */
     public static function billing_fields() {
         return array(); // return empty, means hide
     }
-
     /**
      * Before checkout billing form
      */
     public static function before_checkout_billing_form() {
         echo '<p>' . __('Billing details will need to be entered in the Wompi widget', 'woocommerce-gateway-wompi') . '</p>';
     }
-
     /**
      * Generate order key on thank you page
      */
@@ -118,10 +106,8 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
             $order = wc_get_order( $wp->query_vars['order-received'] );
             $order_key = $order->get_order_key();
         }
-
         return $order_key;
     }
-
     /**
      * Inform user if status of received order is failed on the thank you page
      */
@@ -145,7 +131,6 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
             $errors->add( 'validation', sprintf( __( 'Sorry, the minimum allowed order total is %1$s to use this payment method.', 'woocommerce-gateway-wompi' ), wc_remove_number_precision( self::MINIMUM_ORDER_AMOUNT ) ) );
         }
     }
-
     /**
      * Validates that the order meets the minimum order amount
      */
@@ -156,7 +141,6 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
             return true;
         }
     }
-
     /**
      * Output payment method type on order admin page
      */
