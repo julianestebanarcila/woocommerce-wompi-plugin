@@ -1,11 +1,9 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
 /**
  * Communicates with Wompi API
  */
 class WC_Wompi_API {
-
     /**
      * Define API constants
      */
@@ -16,27 +14,22 @@ class WC_Wompi_API {
     const STATUS_DECLINED = 'DECLINED';
     const STATUS_VOIDED = 'VOIDED';
     const PAYMENT_TYPE_CARD = 'CARD';
-
     /**
      * The single instance of the class
      */
     protected static $_instance = null;
-
     /**
      * API endpoint
      */
     private $endpoint = '';
-
     /**
      * Public API Key
      */
     private $public_key = '';
-
 	/**
 	 * Private API Key
 	 */
 	private $private_key = '';
-
     /**
      * Instance
      */
@@ -44,17 +37,13 @@ class WC_Wompi_API {
         if ( is_null( self::$_instance ) ) {
             self::$_instance = new self();
         }
-
         return self::$_instance;
     }
-
     /**
      * Constructor
      */
     public function __construct() {
-
         $options = WC_Wompi::$settings;
-
         if ( 'yes' === $options['testmode'] ) {
             $this->endpoint = self::ENDPOINT_TEST;
             $this->public_key = $options['test_public_key'];
@@ -65,7 +54,6 @@ class WC_Wompi_API {
             $this->private_key = $options['private_key'];
         }
     }
-
     /**
      * Getter
      */
@@ -74,7 +62,6 @@ class WC_Wompi_API {
             return $this->$name;
         }
     }
-
 	/**
 	 * Generates the headers to pass to API request
 	 */
@@ -84,10 +71,8 @@ class WC_Wompi_API {
         if ( $use_secret ) {
             $headers['Authorization'] = 'Bearer ' . $this->private_key;
         }
-
 		return $headers;
 	}
-
 	/**
 	 * Send the request to Wompi's API
 	 */
@@ -96,32 +81,25 @@ class WC_Wompi_API {
 		if ( ! is_null( $data ) ) {
             WC_Wompi_Logger::log( 'REQUEST DATA: ' . print_r( $data, true ), false );
         }
-
         $headers = $this->get_headers( $use_secret );
-
 		$params = array(
             'method'  => $method,
             'headers' => $headers,
             'body'    => $data,
         );
-
         // Exclude private key from logs
         if ( 'yes' === WC_Wompi::$settings['logging'] && ! empty( $headers ) ) {
             $strlen = strlen( $this->private_key );
             $headers['Authorization'] = 'Bearer ' . ( ! empty( $strlen ) ? str_repeat( 'X', $strlen ) : '' );
             WC_Wompi_Logger::log( 'REQUEST HEADERS: ' . print_r( $headers, true ), false );
         }
-
 		$response = wp_safe_remote_post( $this->endpoint . $request, $params );
         WC_Wompi_Logger::log( 'REQUEST RESPONSE: ' . print_r( $response, true ), false );
-
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
-
         return json_decode( $response['body'] );
 	}
-
     /**
      * Transaction void
      */
@@ -129,7 +107,6 @@ class WC_Wompi_API {
         $response = $this->request( 'POST', '/transactions/' . $transaction_id . '/void', null, true );
         return $response->data->status == self::STATUS_APPROVED ? true : false;
     }
-
     /**
      * Get merchant data
      */
@@ -148,5 +125,4 @@ class WC_Wompi_API {
         }
     }
 }
-
 WC_Wompi_API::instance();

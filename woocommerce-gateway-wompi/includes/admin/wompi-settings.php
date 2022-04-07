@@ -1,6 +1,5 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
 return apply_filters(
 	'wc_wompi_settings',
 	array(

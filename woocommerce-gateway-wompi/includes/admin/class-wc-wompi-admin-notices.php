@@ -1,6 +1,5 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
 /**
  * Class that represents admin notices.
  */
@@ -9,14 +8,12 @@ class WC_Wompi_Admin_Notices {
 	 * Notices (array)
 	 */
 	public $notices = array();
-
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 	}
-
 	/**
 	 * Allow this class and other classes to add slug keyed notices (to avoid duplication).
 	 */
@@ -27,7 +24,6 @@ class WC_Wompi_Admin_Notices {
 			'dismissible' => $dismissible,
 		);
 	}
-
 	/**
 	 * Display any notices we've collected thus far.
 	 */
@@ -35,14 +31,11 @@ class WC_Wompi_Admin_Notices {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
-
 		$this->wompi_check_environment();
-
 		foreach ( (array) $this->notices as $notice_key => $notice ) {
 			echo '<div class="' . esc_attr( $notice['class'] ) . '"><p>' . wp_kses( $notice['message'], array( 'a' => array( 'href' => array(), 'target' => array() ) ) ) . '</p></div>';
 		}
 	}
-
 	/**
 	 * The backup sanity check, in case the plugin is activated in a weird way,
 	 * or the environment changes after activation. Also handles upgrade routines.
@@ -56,14 +49,10 @@ class WC_Wompi_Admin_Notices {
 		$live_pub_key       = isset( $options['public_key'] ) ? $options['public_key'] : '';
 		$live_secret_key    = isset( $options['private_key'] ) ? $options['private_key'] : '';
 		$event_secret_key    = isset( $options['event_secret_key'] ) ? $options['event_secret_key'] : '';
-
 		if ( isset( $options['enabled'] ) && 'yes' === $options['enabled'] ) {
-
             $keys_valid = true;
-
             $supported_currency = WC_Gateway_Wompi::get_supported_currency();
             $setting_link = $this->get_setting_link();
-
             // Check if keys are entered properly per live/test mode.
             if ( $testmode ) {
                 if (
@@ -84,9 +73,7 @@ class WC_Wompi_Admin_Notices {
                     $keys_valid = false;
                 }
             }
-
             if ( $keys_valid ) {
-
                 // Supported currency notice
                 if ( ! in_array( get_woocommerce_currency(), $supported_currency ) ) {
                     $this->add_admin_notice( 'wc_wompi', 'notice notice-error', sprintf( __( '%1$s is enabled - it requires store currency to be set to %2$s', 'woocommerce-gateway-wompi' ), 'WC_Gateway_Wompi', implode( ', ', $supported_currency ) ) );
@@ -94,17 +81,13 @@ class WC_Wompi_Admin_Notices {
             }
 		}
 	}
-
 	/**
 	 * Get setting link.
 	 */
 	public function get_setting_link() {
 		$use_id_as_section = function_exists( 'WC' ) ? version_compare( WC()->version, '2.6', '>=' ) : false;
-
 		$section_slug = $use_id_as_section ? 'wompi' : strtolower( 'WC_Gateway_Wompi' );
-
 		return admin_url( 'admin.php?page=wc-settings&tab=checkout&section=' . $section_slug );
 	}
 }
-
 new WC_Wompi_Admin_Notices();

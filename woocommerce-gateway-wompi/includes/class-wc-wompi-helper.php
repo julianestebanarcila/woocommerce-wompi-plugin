@@ -1,11 +1,9 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
 /**
  * Provides static methods as helpers
  */
 class WC_Wompi_Helper {
-
     /**
      * Check if current request is webhook
      */
@@ -19,7 +17,6 @@ class WC_Wompi_Helper {
             return false;
         }
     }
-
     /**
      * Get amount in cents
      */

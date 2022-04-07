@@ -1,6 +1,5 @@
 <?php
 defined( 'ABSPATH' ) || exit;
-
 /**
  * Payment Gateway class
  */
@@ -10,9 +9,7 @@ class WC_Gateway_Wompi extends WC_Gateway_Wompi_Custom {
      * Constructor
      */
     public function __construct() {
-
         $options = WC_Wompi::$settings;
-
         $this->id = 'wompi';
         $this->method_title = 'WOMPI';
         $this->method_description = sprintf( __( 'Wompi works via Widget Checkout. <a href="%1$s" target="_blank">Sign up</a> for a Wompi account, and <a href="%2$s" target="_blank">get your Wompi account keys</a>.', 'woocommerce-gateway-wompi' ), 'https://comercios.wompi.co/', 'https://comercios.wompi.co/my-account' );
@@ -30,14 +27,12 @@ class WC_Gateway_Wompi extends WC_Gateway_Wompi_Custom {
         $this->public_key  = $this->testmode ? $options['test_public_key'] : $options['public_key'];
         $this->private_key = $this->testmode ? $options['test_private_key'] : $options['private_key'];
         $this->event_secret_key = $this->testmode ? $options['test_event_secret_key'] : $options['event_secret_key'];
-
         // Hooks
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
         if ( 'yes' === $this->enabled ) {
             $this->init_hooks();
         }
     }
-
     /**
      * Checks to see if all criteria is met before showing payment method
      */
@@ -50,17 +45,14 @@ class WC_Gateway_Wompi extends WC_Gateway_Wompi_Custom {
 				) {
 						return false;
 				}
-
 				return true;
     }
-
     /**
      * Initialise Gateway Settings Form Fields
      */
     public function init_form_fields() {
         $this->form_fields = require( dirname( __FILE__ ) . '/admin/wompi-settings.php' );
     }
-
     /**
      * Gets the transaction URL linked to Wompi dashboard
      */
@@ -69,7 +61,6 @@ class WC_Gateway_Wompi extends WC_Gateway_Wompi_Custom {
 
         return parent::get_transaction_url( $order );
     }
-
     /**
      * Process the payment (after place order)
      */
@@ -82,7 +73,6 @@ class WC_Gateway_Wompi extends WC_Gateway_Wompi_Custom {
             /* < 2.1.0 */
             $checkout_payment_url = get_permalink( get_option('woocommerce_pay_page_id') );
         }
-
         // Clear cart
         WC()->cart->empty_cart();
 
@@ -91,7 +81,6 @@ class WC_Gateway_Wompi extends WC_Gateway_Wompi_Custom {
             'redirect' => add_query_arg( 'order_pay', $order_id, $checkout_payment_url )
         );
     }
-
     /**
      * Process the payment to void
      */

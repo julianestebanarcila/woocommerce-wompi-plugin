@@ -36,11 +36,8 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
         $tax = $order->total_tax * 100;
         $phone = $order->get_billing_phone();
         $out = '';
-        $out .= '<div class="wompi-button-holder">';
-        if($order->get_shipping_address_1() !== '')
-        {
-            $out .= '
-            <script
+        $valores = '';
+        $valores .= '
                 src="https://checkout.wompi.co/widget.js"
                 data-render="button"
                 data-public-key="'.( WC_Wompi::$settings['testmode'] === 'yes' ? WC_Wompi::$settings['test_public_key'] : WC_Wompi::$settings['public_key'] ).'"
@@ -51,7 +48,13 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
                 data-customer-data:email="'.$order->get_billing_email().'"
                 data-customer-data:full-name="'.$order->get_billing_first_name() . " " . $order->get_billing_last_name().'"
                 data-customer-data:phone-number="'.$phone.'"
-                data-customer-data:phone-number-prefix="+57"
+                data-customer-data:phone-number-prefix="+57"';
+
+        if($order->get_shipping_address_1() !== '')
+        {
+            $out .= '
+            <script
+                "'.$valores.'"
                 data-shipping-address:address-line-1="'.$order->get_shipping_address_1().'"
                 data-shipping-address:country="'.$order->get_shipping_country().'"
                 data-shipping-address:city="'.$order->get_shipping_city().'"
@@ -66,17 +69,7 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
         {
             $out .= '
             <script
-                src="https://checkout.wompi.co/widget.js"
-                data-render="button"
-                data-public-key="'.( WC_Wompi::$settings['testmode'] === 'yes' ? WC_Wompi::$settings['test_public_key'] : WC_Wompi::$settings['public_key'] ).'"
-                data-currency="'.get_woocommerce_currency().'"
-                data-amount-in-cents="'.WC_Wompi_Helper::get_amount_in_cents( $order->get_total()).'"
-                data-reference="'.$order_id.'"
-                data-tax-in-cents:vat="'.WC_Wompi_Helper::get_amount_in_cents($order->total_tax).'"
-                data-customer-data:email="'.$order->get_billing_email().'"
-                data-customer-data:full-name="'.$order->get_billing_first_name() . " " . $order->get_billing_last_name().'"
-                data-customer-data:phone-number="'.$phone.'"
-                data-customer-data:phone-number-prefix="+57"
+                "'.$valores.'"
                 data-redirect-url="'.$order->get_checkout_order_received_url().'"
                 >
             </script>
@@ -121,7 +114,6 @@ class WC_Gateway_Wompi_Custom extends WC_Payment_Gateway {
             return $text;
         }
     }
-
     /**
      * Validation on checkout page
      */

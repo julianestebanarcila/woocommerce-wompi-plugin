@@ -5,12 +5,10 @@ defined( 'ABSPATH' ) || exit;
  * Add custom order statuses
  */
 class WC_Wompi_Order_Statuses {
-
     /**
      * Vars
      */
     const VOIDED_EXPIRY = 3600; // 1 hour
-
     /**
      * Init
      */
@@ -19,7 +17,6 @@ class WC_Wompi_Order_Statuses {
         add_filter( 'wc_order_statuses', array( $this, 'order_statuses' ) );
         add_action( 'woocommerce_process_shop_order_meta', array( $this, 'process_shop_order_meta' ) );
     }
-
     /**
      * Add custom status to order list
      */
@@ -34,7 +31,6 @@ class WC_Wompi_Order_Statuses {
         ) );
 
     }
-
     /**
      * Add custom status to order page drop down
      */
@@ -57,10 +53,8 @@ class WC_Wompi_Order_Statuses {
         if ( $add_status ) {
             $order_statuses['wc-voided'] = _x( 'Voided', 'Order status', 'woocommerce-gateway-wompi' );
         }
-
         return $order_statuses;
     }
-
     /**
      * Check allowing to change order to Voided status
      */
@@ -69,25 +63,20 @@ class WC_Wompi_Order_Statuses {
         if ( $status != 'completed') {
             return false;
         }
-
         $order_id = method_exists( $order, 'get_id' ) ? $order->get_id() : $order->id;
         if ( get_post_meta( $order_id, WC_Wompi::FIELD_PAYMENT_METHOD_TYPE, true ) != WC_Wompi_API::PAYMENT_TYPE_CARD ) {
             return false;
         }
-
         $time_diff = current_time('timestamp') - $order->get_date_completed()->getOffsetTimestamp();
         if ( $time_diff > self::VOIDED_EXPIRY ) {
             return false;
         }
-
         return true;
     }
-
     /**
      * On order update
      */
     public function process_shop_order_meta( $order_id ) {
-
         // Change order status to Voided
         if ( $_POST['order_status'] == 'wc-voided' ) {
             $order = new WC_Order( $order_id );
@@ -103,23 +92,17 @@ class WC_Wompi_Order_Statuses {
             }
         }
     }
-
     /**
      * On order void
      */
     public function order_void( $order ) {
-
         // API Void
         if ( WC_Wompi_API::instance()->transaction_void( $order->get_transaction_id() ) ) {
-
             // Gateway process
             WC_Gateway_Wompi::process_void( $order );
-
             return true;
         }
-
         return false;
     }
 }
-
 new WC_Wompi_Order_Statuses();
